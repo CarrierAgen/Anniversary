@@ -6,6 +6,7 @@
     <title>Our Love Story ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
         * { box_sizing: border-box; margin: 0; padding: 0; }
@@ -16,112 +17,87 @@
             width: 100vw; height: 100vh; overflow: hidden; position: relative;
         }
 
-        /* --- Card หลัก (ขยายใหญ่) --- */
+        /* --- Card หลัก --- */
         .card {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(255, 255, 255, 0.95); 
-            padding: 3.5rem; /* เพิ่ม Padding */
-            border-radius: 40px;
+            padding: 3rem; border-radius: 40px;
             box-shadow: 0 25px 60px rgba(255, 105, 180, 0.5); 
             text-align: center;
-            width: 95%; 
-            max-width: 700px; /* <<< ขยายกว้างขึ้นมาก */
-            z-index: 10; 
-            border: 8px solid #fff;
+            width: 95%; max-width: 700px;
+            z-index: 10; border: 8px solid #fff;
             max-height: 95vh; overflow-y: auto;
         }
 
-        h1 { 
-            color: #ff4081; 
-            font-size: 3.5rem; /* หัวข้อใหญ่สะใจ */
-            margin-bottom: 2rem; 
-            text-shadow: 3px 3px 0px #ffe4e1;
-        }
-
+        h1 { color: #ff4081; font-size: 3rem; margin-bottom: 2rem; text-shadow: 3px 3px 0px #ffe4e1; }
         .input-group { margin-bottom: 20px; text-align: left; }
-        
-        label { 
-            display: block; color: #d81b60; font-weight: bold; margin-bottom: 8px; 
-            font-size: 1.5rem; /* ปรับขนาด label */
-            text-align: center;
-        }
-
+        label { display: block; color: #d81b60; font-weight: bold; margin-bottom: 8px; font-size: 1.5rem; text-align: center; }
         input[type="text"], input[type="date"] {
-            width: 100%; padding: 15px; 
-            border: 4px solid #ffc1e3; border-radius: 50px;
-            font-family: 'Mali', cursive; 
-            text-align: center; background: #fff0f6; outline: none;
-            font-size: 1.5rem; /* ตัวหนังสือในช่องกรอกใหญ่ขึ้น */
+            width: 100%; padding: 15px; border: 4px solid #ffc1e3; border-radius: 50px;
+            font-family: 'Mali', cursive; text-align: center; background: #fff0f6; outline: none; font-size: 1.5rem;
         }
-        input:focus { border-color: #ff4081; box-shadow: 0 0 15px rgba(255, 64, 129, 0.3); }
 
-        /* ปุ่มเลือกรูป (ใหญ่ขึ้น) */
+        /* ปุ่มเลือกรูป */
         .upload-row { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
         .upload-btn {
             background: #ffb6c1; color: white; padding: 15px; border-radius: 20px;
             font-size: 1.2rem; cursor: pointer; width: 48%; text-align: center;
-            border: 3px solid #ff69b4; display: flex; flex-direction: column; align-items: center;
-            transition: 0.3s;
+            border: 3px solid #ff69b4; display: flex; flex-direction: column; align-items: center; transition: 0.3s;
         }
         .upload-btn:hover { background: #ff69b4; transform: scale(1.05); }
         input[type="file"] { display: none; }
         
         button {
             background: linear-gradient(45deg, #ff4081, #ff80ab); color: white; border: none;
-            padding: 20px; font-size: 2rem; border-radius: 60px; cursor: pointer;
+            padding: 20px; font-size: 1.8rem; border-radius: 60px; cursor: pointer;
             width: 100%; margin-top: 20px; box-shadow: 0 8px 20px rgba(255, 64, 129, 0.4);
             font-family: 'Itim', cursive; transition: 0.3s;
         }
         button:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255, 64, 129, 0.6); }
 
-        /* --- Pop-up ผลลัพธ์ (ขยายใหญ่ยักษ์) --- */
+        /* --- Pop-up ผลลัพธ์ --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 2000; backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.85); z-index: 2000; backdrop-filter: blur(5px);
             align-items: center; justify-content: center; overflow-y: auto;
         }
+        
+        /* เพิ่ม id ให้ capture-area เพื่อระบุส่วนที่จะเซฟเป็นรูป */
         .modal-content {
             background: white; padding: 40px; border-radius: 50px; width: 95%; 
-            max-width: 800px; /* <<< กล่องผลลัพธ์กว้าง 800px */
-            text-align: center; border: 10px solid #ffb6c1; position: relative;
+            max-width: 800px; text-align: center; border: 10px solid #ffb6c1; position: relative;
             margin: auto;
         }
 
-        /* รูปคู่ (ใหญ่เบิ้ม) */
+        /* รูปคู่ */
         .photo-couple { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; align-items: center; }
         .circle-img {
-            width: 180px; height: 180px; /* ขยายรูปเป็น 180px */
-            border-radius: 50%; border: 6px solid #ff4081;
+            width: 150px; height: 150px; border-radius: 50%; border: 6px solid #ff4081;
             object-fit: cover; background: #eee;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        
-        .heart-icon { font-size: 5rem; animation: pulse 1s infinite; color: #ff1493; }
+        .heart-icon { font-size: 4rem; animation: pulse 1s infinite; color: #ff1493; }
 
-        /* กล่องเวลา */
-        .time-box { 
-            background: #fff0f5; padding: 25px; border-radius: 30px; 
-            margin: 25px 0; border: 4px dashed #ff80ab; 
-        }
-        .big-number { font-size: 4rem; font-weight: bold; color: #ff4081; line-height: 1; }
-        .unit-text { font-size: 1.5rem; color: #880e4f; }
+        .time-box { background: #fff0f5; padding: 25px; border-radius: 30px; margin: 25px 0; border: 4px dashed #ff80ab; }
+        .big-number { font-size: 3.5rem; font-weight: bold; color: #ff4081; line-height: 1; }
+        .unit-text { font-size: 1.2rem; color: #880e4f; }
         
         .seconds-box {
             background: linear-gradient(45deg, #ff4081, #ff80ab); color: white; 
-            padding: 20px; border-radius: 25px;
-            margin-top: 15px; animation: pulse 2s infinite; box-shadow: 0 10px 25px rgba(255, 20, 147, 0.4);
+            padding: 20px; border-radius: 25px; margin-top: 15px; animation: pulse 2s infinite;
         }
-        .seconds-number { font-size: 3.5rem; font-weight: bold; display: block; } /* วินาทีตัวใหญ่มาก */
+        .seconds-number { font-size: 3rem; font-weight: bold; display: block; }
 
-        /* ส่วน QR Code */
+        /* ปุ่มต่างๆ ในหน้าผลลัพธ์ */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        
+        /* ปุ่มดาวน์โหลด (สีฟ้าสดใส) */
+        .dl-btn { background: #00bfff; font-size: 1.2rem; padding: 15px; box-shadow: 0 5px 15px rgba(0, 191, 255, 0.4); }
+        .qr-btn { background: #28a745; font-size: 1.2rem; padding: 15px; box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4); }
+        .close-btn { background: #666; font-size: 1.2rem; padding: 15px; }
+
         #qr-area { margin-top: 25px; padding: 20px; background: white; display: none; flex-direction: column; align-items: center; border-radius: 20px; border: 2px solid #ddd; }
         
-        .close-btn { background: #666; font-size: 1.2rem; padding: 15px 40px; margin-top: 15px; }
-        .qr-btn { background: #28a745; margin-top: 15px; box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4); }
-
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        /* หัวใจร่วง */
         .heart { position: absolute; top: -100px; color: #ff4081; animation: fall linear forwards; z-index: 1; pointer-events: none; }
         @keyframes fall { to { transform: translateY(120vh) rotate(360deg); } }
     </style>
@@ -157,37 +133,42 @@
             <input type="date" id="date">
         </div>
 
-        <button onclick="calc()">❤️ ดูความรักของเรา ❤️</button>
+        <button onclick="calc()">❤️ เสร็จสิ้น ❤️</button>
     </div>
 
     <div class="modal-overlay" id="modal">
         <div class="modal-content">
-            <div class="photo-couple">
-                <img id="img1_res" class="circle-img" src="https://via.placeholder.com/180?text=Me">
-                <div class="heart-icon">❤️</div>
-                <img id="img2_res" class="circle-img" src="https://via.placeholder.com/180?text=You">
-            </div>
-
-            <h2 id="names-show" style="color:#d81b60; font-size: 2.5rem; margin-bottom: 20px;"></h2>
             
-            <div class="time-box">
-                <span id="y" class="big-number">0</span> <span class="unit-text">ปี</span> &nbsp;
-                <span id="m" class="big-number">0</span> <span class="unit-text">เดือน</span> &nbsp;
-                <span id="d" class="big-number">0</span> <span class="unit-text">วัน</span>
-            </div>
+            <div id="capture-area" style="background: white; padding: 20px; border-radius: 30px;">
+                <div class="photo-couple">
+                    <img id="img1_res" class="circle-img" src="https://via.placeholder.com/180?text=Me">
+                    <div class="heart-icon">❤️</div>
+                    <img id="img2_res" class="circle-img" src="https://via.placeholder.com/180?text=You">
+                </div>
 
-            <div class="seconds-box">
-                <div style="font-size: 1.2rem;">วินาทีแห่งความรักทั้งหมด</div>
-                <span id="s" class="seconds-number">0</span>
-            </div>
+                <h2 id="names-show" style="color:#d81b60; font-size: 2.5rem; margin-bottom: 20px;"></h2>
+                
+                <div class="time-box">
+                    <span id="y" class="big-number">0</span> <span class="unit-text">ปี</span> &nbsp;
+                    <span id="m" class="big-number">0</span> <span class="unit-text">เดือน</span> &nbsp;
+                    <span id="d" class="big-number">0</span> <span class="unit-text">วัน</span>
+                </div>
 
+                <div class="seconds-box">
+                    <div style="font-size: 1.2rem;">วินาทีทั้งหมด</div>
+                    <span id="s" class="seconds-number">0</span>
+                </div>
+            </div>
             <div id="qr-area">
                 <div id="qrcode"></div>
-                <small style="color:red; margin-top:10px; font-size: 1rem;">*ใช้มือถือสแกนได้เลยจ้า*</small>
+                <small style="color:red; margin-top:10px; font-size: 1rem;">*สแกนเพื่อเปิดหน้านี้*</small>
             </div>
 
-            <button class="qr-btn" onclick="makeQR()">📲 สร้าง QR Code ให้แฟน</button>
-            <button class="close-btn" onclick="closeModal()">ปิดหน้าต่าง</button>
+            <div class="btn-group">
+                <button class="dl-btn" onclick="downloadImage()">📥 ดาวน์โหลดรูปเก็บไว้</button>
+                <button class="qr-btn" onclick="makeQR()">📲 สร้าง QR Code ให้แฟน</button>
+                <button class="close-btn" onclick="closeModal()">ปิดหน้าต่าง</button>
+            </div>
         </div>
     </div>
 
@@ -249,6 +230,22 @@
             for(let i=0; i<30; i++) setTimeout(createHeart, i*40);
         }
 
+        // ฟังก์ชันดาวน์โหลดรูป (เพิ่มใหม่)
+        function downloadImage() {
+            const element = document.getElementById("capture-area"); // เลือกเฉพาะส่วนข้อมูล
+            
+            html2canvas(element, { 
+                backgroundColor: "#ffffff", // บังคับพื้นหลังสีขาว
+                scale: 2 // เพิ่มความชัด 2 เท่า
+            }).then(canvas => {
+                // สร้างลิงก์ดาวน์โหลดปลอมๆ
+                const link = document.createElement("a");
+                link.download = "our-love-story.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click(); // สั่งกดลิงก์อัตโนมัติ
+            });
+        }
+
         function makeQR() {
             let n1 = encodeURIComponent(document.getElementById('n1').value);
             let n2 = encodeURIComponent(document.getElementById('n2').value);
@@ -271,7 +268,7 @@
             heart.innerHTML = ['❤️', '💖', '💕', '🌹', '🥰'][Math.floor(Math.random() * 5)];
             heart.style.left = Math.random() * 100 + "vw";
             heart.style.animationDuration = Math.random() * 2 + 3 + "s";
-            heart.style.fontSize = Math.random() * 30 + 20 + "px"; /* หัวใจตกใหญ่ขึ้นด้วย */
+            heart.style.fontSize = Math.random() * 30 + 20 + "px";
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 5000);
         }
